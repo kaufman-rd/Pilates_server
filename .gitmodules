@@ -1,0 +1,3 @@
+[submodule "backend/acs_component"]
+	path = backend/acs_component
+	url = https://github.com/dansoskin/acs_component.git
