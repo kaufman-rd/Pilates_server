@@ -20,13 +20,13 @@ class PilatesController(acs.ACSController):
     def child_loop(self):
         self.position = sp.GetFPosition(self.handle, 0)
         # self.velocity = sp.GetFVelocity(self.handle, 0)
-        self.velocity = self.read_scalar("PREDICTION", 'float') or 1.0
+        self.velocity = self.read_scalar("PREDICTION", 'float')
 
-        self.weight = self.read_scalar("WEIGHT", 'float') or 1.0
-        # self.total_weight = self.read_scalar("TOTAL_WEIGHT", 'float') or 1.0
-        self.total_weight = self.read_scalar("XCURI(0)", 'float') or 1.0
-        self.rubber_coeff = self.read_scalar("RUBBER", 'float') or 1.0
-        self.pull_coeff = self.read_scalar("PULL", 'float') or 1.0
-        self.push_coeff = self.read_scalar("PUSH", 'float') or 1.0
+        self.weight = self.read_scalar("WEIGHT", 'float')
+        # self.total_weight = self.read_scalar("TOTAL_WEIGHT", 'float')
+        self.total_weight = self.read_scalar("XCURI(0)", 'float')
+        self.rubber_coeff = self.read_scalar("RUBBER", 'float')
+        self.pull_coeff = self.read_scalar("PULL", 'float')
+        self.push_coeff = self.read_scalar("PUSH", 'float')
 
 pilates = PilatesController()
