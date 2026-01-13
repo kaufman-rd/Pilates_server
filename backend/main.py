@@ -84,3 +84,6 @@ if __name__ == '__main__':
     threading.Thread(target=manual_listener, daemon=True).start()
     socketio.start_background_task(bg_task)
     socketio.run(app, debug=True, use_reloader=False, port=8000)
+
+    # while True:
+    #     time.sleep(1)
