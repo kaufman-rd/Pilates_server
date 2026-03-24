@@ -61,8 +61,8 @@ def bg_task():
             'rubber_coeff': round(acs.pilates.rubber_coeff, 2),
             'pull_coeff': round(acs.pilates.pull_coeff, 2),
             'push_coeff': round(acs.pilates.push_coeff, 2),
+            'shake_coeff': round(acs.pilates.shake_coef, 2),
             'connected_clients': connected_clients,
-
         }
         
         socketio.emit('message', sensor_data)
@@ -116,6 +116,13 @@ def handle_message(data):
             if data_value_float < 0 or data_value_float > 100:
                 raise ValueError("Push value out of range (0-100)")
             acs.pilates.execute_command(f"PUSH={data_value_float}")
+        elif data.startswith('SHAKE='):
+            data_value = data.split('=')[1]
+            data_value_float = float(data_value)
+            if data_value_float < 0 or data_value_float > 100:
+                raise ValueError("Shake value out of range (0-100)")
+            acs.pilates.execute_command(f"SHAKE={data_value_float}")
+            
         else:
             raise ValueError("Unknown command")
         # emit('message', {'status': 'Command executed', 'command': data})

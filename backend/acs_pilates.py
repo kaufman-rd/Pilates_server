@@ -17,6 +17,7 @@ class PilatesController(acs.ACSController):
         self.rubber_coeff = 0.0
         self.pull_coeff = 0.0
         self.push_coeff = 0.0
+        self.shake_coef = 0.0
 
         self.conversion_to_meters = 120.0* math.pi / 16384
 
@@ -31,5 +32,6 @@ class PilatesController(acs.ACSController):
         self.rubber_coeff = self.read_scalar("RUBBER", 'float')
         self.pull_coeff = self.read_scalar("PULL", 'float')
         self.push_coeff = self.read_scalar("PUSH", 'float')
+        self.shake_coef = self.read_scalar("SHAKE", 'float')
 
 pilates = PilatesController()
