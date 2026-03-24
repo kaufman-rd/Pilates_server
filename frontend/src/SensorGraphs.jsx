@@ -14,7 +14,7 @@ const SensorGraphs = memo(function SensorGraphs({ positionData, velocityData, we
             <XAxis dataKey="index" hide />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#8884d8" dot={false} name="Position" isAnimationActive={false} />
+            <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={4} dot={false} name="Position" isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -27,7 +27,7 @@ const SensorGraphs = memo(function SensorGraphs({ positionData, velocityData, we
             <XAxis dataKey="index" hide />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#82ca9d" dot={false} name="Velocity" isAnimationActive={false} />
+            <Line type="monotone" dataKey="value" stroke="#82ca9d" strokeWidth={4} dot={false} name="Velocity" isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -40,7 +40,7 @@ const SensorGraphs = memo(function SensorGraphs({ positionData, velocityData, we
             <XAxis dataKey="index" hide />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#ffc658" dot={false} name="Weight" isAnimationActive={false} />
+            <Line type="monotone" dataKey="value" stroke="#ffc658" strokeWidth={4} dot={false} name="Weight" isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>

@@ -22,9 +22,12 @@ function App() {
   }, [showDataInTerminal])
 
   useEffect(() => {
-    const socket = io('http://localhost:8000', {
+    const socket = io('http://192.168.120.13:8000', {
       transports: ['websocket', 'polling']
     })
+    // const socket = io('http://localhost:8000', {
+    //   transports: ['websocket', 'polling']
+    // })
     socketRef.current = socket
     
     socket.on('connect', () => {
