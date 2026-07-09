@@ -1,13 +1,11 @@
-from flask import request, jsonify
+from flask import jsonify
 from config import app, socketio
-from flask_socketio import emit
-import random
 import time
-import math
 import threading
 
 # import acs_SPI as acs
 import acs_pilates as acs
+from pySerialWorker.pyserialworker import SerialWorker
 
 
 
@@ -47,27 +45,63 @@ def manual_listener():
 
         time.sleep(0.01)
 
-def bg_task():
-    sample_counter = 0
-    
+def drain_rx(serialworker):
+    """Return the last serial message available, or empty string if none."""
+    last_msg = ""
     while True:
+        msg = serialworker.get_data()
+        if not msg:
+            break
+        last_msg = msg
+    return last_msg
 
-        sensor_data = {
-            'timestamp': time.time(),
-            'position': round(acs.pilates.position, 2),
-            'velocity': round(acs.pilates.velocity, 2),
-            'weight': round(acs.pilates.weight, 2),
-            'total_weight': round(acs.pilates.total_weight, 2),
-            'rubber_coeff': round(acs.pilates.rubber_coeff, 2),
-            'pull_coeff': round(acs.pilates.pull_coeff, 2),
-            'push_coeff': round(acs.pilates.push_coeff, 2),
-            'shake_coeff': round(acs.pilates.shake_coef, 2),
-            'connected_clients': connected_clients,
-        }
-        
-        socketio.emit('message', sensor_data)
-        # logger.info(f"Emitted sensor data: {sensor_data}")
-        socketio.sleep(0.05)  # Send data every 20ms for smooth animation
+def bg_task():
+    """Background task to read sensor data and broadcast to clients."""
+    try:
+        serialworker = SerialWorker(True, False)
+        serialworker.set_terminators("\n", "\n")
+        serialworker.set_connection_params("COM4", 115200)
+        serialworker.start()
+        logger.info("SerialWorker started on COM4")
+    except Exception as e:
+        logger.error(f"Failed to start SerialWorker: {e}")
+        serialworker = None
+
+    while True:
+        try:
+            weight1 = 0
+            weight2 = 0
+
+            if serialworker:
+                msg = drain_rx(serialworker)
+                if msg.startswith("loadcell_data: "):
+                    try:
+                        payload = msg.replace("loadcell_data: ", "")
+                        weight1, weight2 = map(float, payload.split(',')[0:2])
+                    except (ValueError, IndexError):
+                        logger.warning(f"Failed to parse loadcell data: {msg}")
+
+            sensor_data = {
+                'timestamp': time.time(),
+                'position': round(acs.pilates.position, 2),
+                'velocity': round(acs.pilates.velocity, 2),
+                'weight': round(acs.pilates.weight, 2),
+                'total_weight': round(acs.pilates.total_weight, 2),
+                'rubber_coeff': round(acs.pilates.rubber_coeff, 2),
+                'pull_coeff': round(acs.pilates.pull_coeff, 2),
+                'push_coeff': round(acs.pilates.push_coeff, 2),
+                'shake_coeff': round(acs.pilates.shake_coeff, 2),
+                'hand1': weight1,
+                'hand2': weight2,
+                'connected_clients': connected_clients,
+            }
+
+            socketio.emit('message', sensor_data)
+            time.sleep(0.05)
+
+        except Exception as e:
+            logger.error(f"Error in bg_task: {e}")
+            time.sleep(0.1)
 
 @socketio.on('connect')
 def handle_connect():
@@ -92,35 +126,36 @@ def handle_message(data):
         elif data.startswith('WEIGHT='):
             data_value = data.split('=')[1]
             data_value_float = float(data_value)
-            if data_value_float < 0 or data_value_float > 40:
-                raise ValueError("Weight value out of range (0-40)")
+            # if data_value_float < 0 or data_value_float > 1000:
+            #     raise ValueError("Weight value out of range (0-1000)")
             acs.pilates.execute_command(f"WEIGHT={data_value_float}")
         
         elif data.startswith('RUBBER='):
             data_value = data.split('=')[1]
             data_value_float = float(data_value)
-            if data_value_float < 0 or data_value_float > 100:
-                raise ValueError("Rubber value out of range (0-100)")
+            # if data_value_float < 0 or data_value_float > 100:
+            #     raise ValueError("Rubber value out of range (0-100)")
             acs.pilates.execute_command(f"RUBBER={data_value_float}")
 
         elif data.startswith('PULL='):
             data_value = data.split('=')[1]
             data_value_float = float(data_value)
-            if data_value_float < 0 or data_value_float > 100:
-                raise ValueError("Pull value out of range (0-100)")
+            # if data_value_float < 0 or data_value_float > 100:
+            #     raise ValueError("Pull value out of range (0-100)")
             acs.pilates.execute_command(f"PULL={data_value_float}")
 
         elif data.startswith('PUSH='):
             data_value = data.split('=')[1]
             data_value_float = float(data_value)
-            if data_value_float < 0 or data_value_float > 100:
-                raise ValueError("Push value out of range (0-100)")
+            # if data_value_float < 0 or data_value_float > 100:
+            #     raise ValueError("Push value out of range (0-100)")
             acs.pilates.execute_command(f"PUSH={data_value_float}")
+            
         elif data.startswith('SHAKE='):
             data_value = data.split('=')[1]
             data_value_float = float(data_value)
-            if data_value_float < 0 or data_value_float > 100:
-                raise ValueError("Shake value out of range (0-100)")
+            # if data_value_float < 0 or data_value_float > 100:
+            #     raise ValueError("Shake value out of range (0-100)")
             acs.pilates.execute_command(f"SHAKE={data_value_float}")
             
         else:
