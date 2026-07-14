@@ -96,6 +96,7 @@ def bg_task():
                 'connected_clients': connected_clients,
             }
 
+            # logger.info(f"Broadcasting sensor data: {sensor_data}")
             socketio.emit('message', sensor_data)
             time.sleep(0.05)
 
